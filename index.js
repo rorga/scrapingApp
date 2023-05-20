@@ -32,14 +32,14 @@ async function main() {
 
     await page.goto('https://www.global-freaks.com/es/105-wcf');
 
-    const figuritas = await page.$$eval('.product-description', (rows) => (
-        rows.map((row) => {
 
-            const title = row.querySelector('h2 a').innerText.trim();
-
-            return { title };
-        })
-    ));
+    const figuritas = await page.$$eval('.products .card.card-product', (links) => (
+        links.map((link) => ({
+            title: link.querySelector('.card-body .product-description.product__card-desc h2 a').innerText.trim(),
+            price: link.querySelector('.card-body .product-description.product__card-desc .product-price-and-shipping .price').innerText.trim(),
+            img: link.querySelector('.card-img-top.product__card-img.thumbnail-container a img').getAttribute('data-src')
+          }))
+        ));
 
     // Construir el contenido HTML del correo con las figuritas
     let emailContent = `
@@ -74,7 +74,7 @@ async function main() {
 
     // Agregar las figuritas al cuerpo del correo
     figuritas.forEach((figurita) => {
-        emailContent += `<li>${figurita.title}</li>`;
+        emailContent += `<li><h1>${figurita.title}</h1></li><br><img src="${figurita.img}"></li><br><h2>${figurita.price}</h2><br>`;
     });
 
     emailContent += `
