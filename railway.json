@@ -1,0 +1,13 @@
+{
+    "scripts": {
+      "start": "node index.js"
+    },
+    "schedule": {
+      "jobs": [
+        {
+          "command": "start",
+          "cron": "0 */30 * * *"
+        }
+      ]
+    }
+  }
