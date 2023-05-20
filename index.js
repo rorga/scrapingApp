@@ -23,35 +23,7 @@ async function main() {
         from: 'scrapapporga@gmail.com',
         to: 'raul_orga@hotmail.com',
         subject: '¡¡NUEVO PRODUCTO!!',
-        html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>NUEVOS PRODUCTOS ENCONTRADOS</title>
-            <style type="text/css">
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    line-height: 1.5;
-                    color: #333;
-                }
-        
-                h1 {
-                    font-size: 18px;
-                    color: #333;
-                    margin-bottom: 20px;
-                }
-        
-                p {
-                    margin-bottom: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>Entra en la página para verlos: </h1>
-            <h1><a href="https://www.global-freaks.com/es/105-wcf">https://www.global-freaks.com/es/105-wcf</a></h1>
-        </body>
-        </html>`
+        html: ``
     };
 
     const browser = await playwright.chromium.launch({ headless: true });
@@ -68,6 +40,50 @@ async function main() {
             return { title };
         })
     ));
+
+    // Construir el contenido HTML del correo con las figuritas
+    let emailContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>NUEVOS PRODUCTOS ENCONTRADOS</title>
+            <style type="text/css">
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    color: #333;
+                }
+
+                h1 {
+                    font-size: 18px;
+                    color: #333;
+                    margin-bottom: 20px;
+                }
+
+                p {
+                    margin-bottom: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Entra en la página para verlos: </h1>
+            <h1><a href="https://www.global-freaks.com/es/105-wcf">https://www.global-freaks.com/es/105-wcf</a></h1>
+            <h2>Figuritas:</h2>
+        `;
+
+    // Agregar las figuritas al cuerpo del correo
+    figuritas.forEach((figurita) => {
+        emailContent += `<li>${figurita.title}</li>`;
+    });
+
+    emailContent += `
+        </body>
+        </html>
+        `;
+
+    // Actualizar el contenido HTML del correo en mailOptions
+    mailOptions.html = emailContent;
 
     const fileFiguritas = fs.readFileSync("figuritas.txt").toString();
     if (fileFiguritas) {
