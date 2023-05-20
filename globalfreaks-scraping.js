@@ -17,7 +17,7 @@ async function main() {
     }
   });
 
-  const browser = await playwright.chromium.connect("ws://localhost:3000/playwright");
+  const browser = await playwright.chromium.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto('https://www.global-freaks.com/es/105-wcf');
 
