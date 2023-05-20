@@ -6,7 +6,7 @@
       "jobs": [
         {
           "command": "start",
-          "cron": "0 */30 * * *"
+          "cron": "0 */3 * * *"
         }
       ]
     }
