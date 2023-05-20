@@ -2,12 +2,10 @@ const playwright = require('playwright');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const CryptoJS = require('crypto-js');
-const { encryptedPassword, secretKey } = require('./config');
-
-
+const encryptedPassword = require('./config');
 
 // Descifrar la contraseña
-const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, secretKey).toString(CryptoJS.enc.Utf8);
+const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, process.env.secretKey).toString(CryptoJS.enc.Utf8);
 
 async function main() {
   // Configurar el transporte SMTP
