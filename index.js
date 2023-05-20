@@ -1,8 +1,60 @@
 const playwright = require('playwright');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
+const CryptoJS = require('crypto-js');
+const { encryptedPassword, secretKey } = require('./config');
+
+// Descifrar la contraseña
+const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, secretKey).toString(CryptoJS.enc.Utf8);
 
 async function main() {
-    const browser =  await playwright.chromium.launch({ headless: true});
+
+    // Configurar el transporte SMTP
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'scrapapporga@gmail.com',
+            pass: decryptedPassword
+        }
+    });
+
+    // Configurar los detalles del correo electrónico
+    const mailOptions = {
+        from: 'scrapapporga@gmail.com',
+        to: 'raul_orga@hotmail.com',
+        subject: '¡¡NUEVO PRODUCTO!!',
+        html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>NUEVOS PRODUCTOS ENCONTRADOS</title>
+            <style type="text/css">
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    color: #333;
+                }
+        
+                h1 {
+                    font-size: 18px;
+                    color: #333;
+                    margin-bottom: 20px;
+                }
+        
+                p {
+                    margin-bottom: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Entra en la página para verlos: </h1>
+            <h1><a href="https://www.global-freaks.com/es/105-wcf">https://www.global-freaks.com/es/105-wcf</a></h1>
+        </body>
+        </html>`
+    };
+
+    const browser = await playwright.chromium.launch({ headless: true });
 
     const page = await browser.newPage()
 
@@ -16,13 +68,23 @@ async function main() {
             return { title };
         })
     ));
-    
+
     const fileFiguritas = fs.readFileSync("figuritas.txt").toString();
-    if(fileFiguritas){
-        if(fileFiguritas !== figuritas[0].title){
+    if (fileFiguritas) {
+        if (fileFiguritas !== figuritas[0].title) {
             fs.writeFileSync('figuritas.txt', figuritas[0].title.toString());
+            // Enviar el correo electrónico
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log('Error al enviar el correo electrónico:', error);
+                } else {
+                    console.log('Correo electrónico enviado:', info.response);
+                }
+            });
+        } else {
+            console.log('No se ha enviado el correo porque no hay nuevos articulos');
         }
-    }else{
+    } else {
         fs.writeFileSync('figuritas.txt', figuritas[0].title.toString());
     }
 
